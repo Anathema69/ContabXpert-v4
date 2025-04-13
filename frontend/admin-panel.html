@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel de Administración</title>
+    <link rel="stylesheet" href="styles/admin-panel.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="stylesheet"
+          href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap">
+</head>
+<body>
+<div class="admin-container">
+    <aside class="admin-sidebar">
+        <h2>Panel de Admin</h2>
+        <nav>
+            <ul>
+                <li>
+                    <button class="active" id="crearUsuariosBtn" data-title="Crear nuevos usuarios">
+                        <img src="icon/panel_new_user.png" class="sidebar-icon" alt="Crear Usuario">
+                        <span>Crear nuevos usuarios</span>
+                    </button>
+                </li>
+                <li>
+                    <button id="descargarReportesBtn" data-title="Descargar reportes">
+                        <img src="icon/panel_download.png" class="sidebar-icon" alt="Descargar Reportes">
+                        <span>Descargar reportes</span>
+                    </button>
+                </li>
+            </ul>
+        </nav>
+    </aside>
+    <main class="admin-content">
+        <header class="admin-header">
+            <h1>Bienvenido: <span id="userName"></span></h1>
+            <button class="btn-logout" id="logoutBtn">Cerrar sesión</button>
+        </header>
+        <section class="admin-section" id="crearUsuarios">
+            <h2>Registrar Nuevo Usuario</h2>
+            <form class="admin-form" id="registerForm">
+                <div class="input-group">
+                    <span class="icon"><img src="icon/user.png" alt="User icon"></span>
+                    <input type="text" id="regNombre" placeholder="Nombre completo" required>
+                </div>
+                <div class="input-group">
+                    <span class="icon"><img src="icon/mail.png" alt="Mail icon"></span>
+                    <input type="email" id="regEmail" placeholder="Correo electrónico" required>
+                </div>
+                <div class="input-group">
+                    <span class="icon"><img src="icon/pass.png" alt="Password icon"></span>
+                    <input type="password" id="regPassword" placeholder="Crea una contraseña" required>
+                </div>
+                <div class="input-group">
+                    <span class="icon"><img src="icon/settings_new_user.png" alt="Role icon"></span>
+                    <select id="regRole" class="styled-select">
+                        <option value="user">Usuario</option>
+                        <option value="admin">Administrador</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn-primary">Registrar</button>
+            </form>
+        </section>
+    </main>
+</div>
+<div id="loadingOverlay" class="loading-overlay" style="display: none;">
+    <div class="spinner"></div>
+    <p>Registrando usuario...</p>
+</div>
+<div id="toast" class="toast" style="display: none;"></div>
+<script src="js/admin-panel.js"></script>
+</body>
+</html>

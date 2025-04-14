@@ -1,5 +1,5 @@
 /************************************************
- * backend/routes/user-panel.js
+ * routes/user-panel.js
  ************************************************/
 const express = require('express');
 const router = express.Router();
@@ -9,7 +9,6 @@ const User = require('../models/User');
 // GET /api/user/:id
 router.get('/:id', authMiddleware, async (req, res) => {
     try {
-        // Permitir solo si el usuario logueado es el mismo o es admin
         if (!req.user || (req.user.id !== req.params.id && req.user.role !== 'admin')) {
             return res.status(403).json({ message: 'No autorizado' });
         }
@@ -27,20 +26,15 @@ router.get('/:id', authMiddleware, async (req, res) => {
 // PUT /api/user/update/:id
 router.put('/update/:id', authMiddleware, async (req, res) => {
     try {
-        // Verifica permisos: solo el propio usuario o admin
         if (!req.user || (req.user.id !== req.params.id && req.user.role !== 'admin')) {
             return res.status(403).json({ message: 'No autorizado' });
         }
 
-        // Se esperan los campos fullName, telefono, accountNumber y los campos de fecha de nacimiento
+        // Esperamos fullName, telefono, accountNumber y los campos para la fecha de nacimiento
         const { fullName, telefono, accountNumber, birthDia, birthMesHidden, birthAnio } = req.body;
-        const updateData = {
-            fullName,
-            telefono,
-            accountNumber
-        };
+        const updateData = { fullName, telefono, accountNumber };
 
-        // Si se reciben los tres campos para la fecha de nacimiento (no vacíos), se arma la fecha
+        // Si se han enviado los tres campos y no están vacíos, se arma la fecha
         if (
             birthDia && birthDia.trim() !== '' &&
             birthMesHidden && birthMesHidden.trim() !== '' &&

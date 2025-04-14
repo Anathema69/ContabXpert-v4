@@ -260,6 +260,11 @@ document.addEventListener('DOMContentLoaded', async () => {
             formData.append('estadoPago', document.getElementById('estadoPago').value);
             formData.append('fecha', document.getElementById('fechaPagoDia').value);
 
+            // Aquí se envían los 3 campos para la fecha de operación:
+            formData.append('fechaPagoDia', document.getElementById('fechaPagoDia').value);
+            formData.append('fechaPagoMesHidden', document.getElementById('fechaPagoMesHidden').value);
+            formData.append('fechaPagoAnio', document.getElementById('fechaPagoAnio').value);
+
             // Imagen opcional
             const receiptImageInput = document.getElementById('receiptImage');
             if (receiptImageInput && receiptImageInput.files.length > 0) {

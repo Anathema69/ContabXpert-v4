@@ -1,8 +1,4 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // Usaremos delegación de eventos para capturar clics en elementos con clase "delete-btn"
-    // sin importar que se hayan agregado dinámicamente.
-
-    // Referencia al modal de confirmación (asegúrate que exista en el HTML)
     const modal = document.getElementById('deleteConfirmModal');
     const modalClose = modal.querySelector('.modal-close');
     const cancelBtn = document.getElementById('cancelDeleteBtn');
@@ -10,32 +6,28 @@ document.addEventListener('DOMContentLoaded', () => {
 
     let currentOpId = null;
 
-    // Función para abrir el modal
     function openModal(opId) {
         currentOpId = opId;
         modal.style.display = 'block';
     }
 
-    // Función para cerrar el modal
     function closeModal() {
         modal.style.display = 'none';
         currentOpId = null;
     }
 
-    // Delegación de eventos: escucha clics en cualquier parte del documento
+    // Delegación de eventos para detectar clic en botón de eliminación
     document.addEventListener('click', (e) => {
-        // Si el elemento clickeado tiene la clase "delete-btn", se abre el modal
-        if (e.target && e.target.classList.contains('delete-btn')) {
-            const opId = e.target.getAttribute('data-op-id');
+        if (e.target && (e.target.classList.contains('delete-btn') || e.target.closest('.delete-btn'))) {
+            const btn = e.target.closest('.delete-btn');
+            const opId = btn.getAttribute('data-op-id');
             openModal(opId);
         }
     });
 
-    // Asigna los eventos para cerrar el modal
     modalClose.addEventListener('click', closeModal);
     cancelBtn.addEventListener('click', closeModal);
 
-    // Función para mostrar un toast
     function showToast(message, success = true) {
         let toast = document.getElementById('toast');
         if (!toast) {
@@ -53,21 +45,15 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 3000);
     }
 
-    // Al confirmar la eliminación, se manda la petición para cambiar hidden a true
     confirmBtn.addEventListener('click', async () => {
         if (!currentOpId) return;
-
-        // Obtener token
         const token = localStorage.getItem('token');
         if (!token) {
             window.location.href = 'index.html';
             return;
         }
-
-        // Mostrar overlay de carga (si está definido)
         const loadingOverlay = document.getElementById('loadingOverlay');
         if (loadingOverlay) loadingOverlay.style.display = 'flex';
-
         try {
             const response = await fetch(`/api/operation/delete/${currentOpId}`, {
                 method: 'PUT',
@@ -77,12 +63,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 },
                 body: JSON.stringify({ hidden: true })
             });
-
             const data = await response.json();
-
             if (response.ok) {
                 showToast('Registro eliminado con éxito', true);
-                // Recargar la página para actualizar el listado
                 setTimeout(() => {
                     window.location.reload();
                 }, 1500);
@@ -98,7 +81,6 @@ document.addEventListener('DOMContentLoaded', () => {
         closeModal();
     });
 
-    // Cerrar el modal al hacer clic fuera del contenido
     window.addEventListener('click', (event) => {
         if (event.target === modal) {
             closeModal();

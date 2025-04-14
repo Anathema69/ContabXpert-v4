@@ -308,29 +308,22 @@
   </main>
 </div>
 
-<!-- Overlays -->
+<!-- Overlays (para carga y éxito) -->
 <div id="loadingOverlay" class="loading-overlay" style="display: none;">
   <div class="spinner"></div>
   <p>Procesando...</p>
 </div>
-
 <div id="successOverlay" class="overlay" style="display: none;">
   <div class="overlay-content">
     <img src="icon/check.png" alt="Success" />
     <h2>¡Operación registrada con éxito!</h2>
   </div>
 </div>
+<!-- Toast container (si no existe se crea en JS, pero es bueno tenerlo en el HTML) -->
+<div id="toast" class="toast" style="display: none;"></div>
 
-<div id="errorOverlay" class="overlay" style="display: none;">
-  <div class="overlay-content">
-    <img src="icon/error.png" alt="Error" />
-    <h2>Algo salió mal</h2>
-    <p id="errorMessage"></p>
-  </div>
-</div>
-
-<!-- Se incluyen ambos scripts: el script principal del wizard y el de edición (para precargar en modo edit) -->
 <script src="js/user-operations.js"></script>
 <script src="js/user-operation-edit.js"></script>
+<script src="js/user-operation-delete.js"></script>
 </body>
 </html>

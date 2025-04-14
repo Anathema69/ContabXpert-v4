@@ -41,11 +41,20 @@
             <button class="btn-logout" id="logoutBtn">Cerrar sesión</button>
         </header>
 
+        <!-- Barra de filtros -->
+        <div class="filter-bar">
+            <div class="filter-group">
+                <label for="filterTitular">Filtrar por Titular:</label>
+                <input type="text" id="filterTitular" placeholder="Ej. Juan Perez">
+            </div>
+        </div>
+
+        <!-- Contenedor de la tabla -->
         <div class="table-container">
             <table id="operationsTable">
                 <thead>
                 <tr>
-                    <th>Fechaoperacion</th>
+                    <th>Fecha operación</th>
                     <th>Recibió pago</th>
                     <th>N° Operación</th>
                     <th>Canal</th>
@@ -56,29 +65,29 @@
                     <th>Cantidad</th>
                     <th>Comisión</th>
                     <th>Total</th>
-                    <th>Constancia</th>
                     <th>Acciones</th>
                 </tr>
                 </thead>
                 <tbody>
-                <!-- Las filas se generarán de forma dinámica -->
+                <!-- Filas generadas dinámicamente -->
                 </tbody>
             </table>
 
-            <!-- Vista en tarjetas para dispositivos móviles -->
+            <!-- Vista en tarjetas para móviles -->
             <div class="card-view">
                 <!-- Tarjetas generadas dinámicamente -->
             </div>
 
-            <!-- Modal para ver constancia -->
+            <!-- Modal para ver constancia (se deja si se utiliza en la columna de acciones, de lo contrario se puede quitar) -->
             <div id="receiptModal" class="modal">
                 <div class="modal-content">
                     <span class="modal-close">&times;</span>
-                    <img id="modalReceiptImage" src="" alt="Constancia" style="max-width:100%;"/>
+                    <img id="modalReceiptImage" src="" alt="Constancia" style="max-width:100%;">
                 </div>
             </div>
         </div>
 
+        <!-- Toast para notificaciones -->
         <div id="toast" class="toast" style="display: none;"></div>
     </main>
 </div>
@@ -88,7 +97,7 @@
     <div class="modal-content">
         <span class="modal-close">&times;</span>
         <div class="modal-header">
-            <img src="icon/warning.png" alt="Advertencia" class="modal-icon">
+            <img src="icon/options/warning.png" alt="Advertencia" class="modal-icon">
             <h2>Confirmar Eliminación</h2>
         </div>
         <p>¿Estás seguro de eliminar este registro? Esta acción lo retirará del historial pero se conservará internamente.</p>
@@ -99,10 +108,9 @@
     </div>
 </div>
 
-
+<!-- Scripts (orden importante) -->
 <script src="js/user-history-operations.js"></script>
 <script src="js/user-operation-edit.js"></script>
 <script src="js/user-operation-delete.js"></script>
-
 </body>
 </html>

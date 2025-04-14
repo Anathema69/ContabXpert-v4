@@ -227,7 +227,7 @@ router.put('/delete/:id', authMiddleware, async (req, res) => {
             return res.status(403).json({ message: 'No autorizado' });
         }
         // Actualizar el campo hidden a true
-        operation.hidden = true;
+        operation.hidden = false;
         await operation.save();
         res.json({ message: 'Registro eliminado correctamente' });
     } catch (error) {

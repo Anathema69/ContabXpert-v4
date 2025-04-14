@@ -1,10 +1,10 @@
 document.addEventListener('DOMContentLoaded', async () => {
     console.log('DOM loaded -> user-operations.js');
 
-    // Determinar si estamos en modo edición (detecta ?edit= en la query)
+    // Determinar si se está en modo edición (detecta "?edit=" en la URL)
     const isEditMode = window.location.search.includes('edit=');
 
-    // 1. Verificar token, rol y userId
+    // Verificar token, role y userId
     const token = localStorage.getItem('token');
     const role = localStorage.getItem('role');
     const userId = localStorage.getItem('userId');
@@ -25,8 +25,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     }
 
-    // Configuración del toast y overlay de carga
-    const loadingOverlay = document.getElementById('loadingOverlay');
+    // Función toast para notificaciones
     const toast = document.getElementById('toast');
     function showToast(message, success = true) {
         toast.textContent = message;
@@ -38,7 +37,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         }, 3000);
     }
 
-    // Wizard y barra de progreso (se asume que los elementos existen en el HTML)
+    // Configuración del wizard: pasos y sus indicadores
     const steps = [
         document.getElementById('step1'),
         document.getElementById('step2'),
@@ -68,7 +67,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
     goToStep(0);
 
-    // Botones de navegación (asegúrate de que los ids sean correctos en el HTML)
+    // Botones de navegación: Siguiente y Anterior
     const btnNext1 = document.getElementById('btnNext1');
     const btnNext2 = document.getElementById('btnNext2');
     const btnNext3 = document.getElementById('btnNext3');
@@ -82,7 +81,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (btnPrev3) btnPrev3.addEventListener('click', () => goToStep(1));
     if (btnPrev4) btnPrev4.addEventListener('click', () => goToStep(2));
 
-    // Cálculo dinámico del Total (se actualiza al escribir en monto, cantidad o comisión)
+    // Cálculo dinámico del Total: Total = (Monto * Cantidad) + Comisión
     const montoInput = document.getElementById('monto');
     const cantidadInput = document.getElementById('cantidad');
     const comisionInput = document.getElementById('comision');
@@ -98,7 +97,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (cantidadInput) cantidadInput.addEventListener('input', updateTotal);
     if (comisionInput) comisionInput.addEventListener('input', updateTotal);
 
-    // Configuración del selector de mes para la Fecha de operación
+    // Configuración del selector de mes para "Fecha de operación"
     const fechaPagoMonthSelect = document.querySelector('.custom-month-select');
     if (fechaPagoMonthSelect) {
         const fechaPagoMonthTrigger = fechaPagoMonthSelect.querySelector('.custom-month-trigger');
@@ -126,16 +125,18 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     }
 
-    // Si no estamos en modo edición, asignar submit handler para crear la operación
+    // Si NO estamos en modo edición, asignar el submit handler para CREAR la operación
     const operationsForm = document.getElementById('operationsForm');
     if (operationsForm && !isEditMode) {
         operationsForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-            loadingOverlay.style.display = 'flex';
+            const loadingOverlay = document.getElementById('loadingOverlay');
+            if (loadingOverlay) loadingOverlay.style.display = 'flex';
 
             const formData = new FormData();
-            // Paso 1: Recopilar datos. Nota: El campo "Exchange" se envía como plataforma.
+            // Paso 1: Datos de la operación
             formData.append('canal', document.getElementById('canal').value);
+            // El campo "Exchange" se envía como "plataforma"
             formData.append('plataforma', document.getElementById('exchange').value);
             formData.append('ordenNum', document.getElementById('ordenNum').value);
             formData.append('tipoActivo', document.getElementById('tipoActivo').value);
@@ -148,16 +149,16 @@ document.addEventListener('DOMContentLoaded', async () => {
             formData.append('fechaPagoDia', document.getElementById('fechaPagoDia').value);
             formData.append('fechaPagoMesHidden', document.getElementById('fechaPagoMesHidden').value);
             formData.append('fechaPagoAnio', document.getElementById('fechaPagoAnio').value);
-            // Paso 2:
+            // Paso 2: Titular Exchange
             formData.append('titularNombre', document.getElementById('titularNombre').value);
             formData.append('titularTipoID', document.getElementById('titularTipoID').value);
             formData.append('titularDocumento', document.getElementById('titularDocumento').value);
             formData.append('titularDireccion', document.getElementById('titularDireccion').value);
-            // Paso 3:
+            // Paso 3: Tercero/Pago
             formData.append('terceroNombre', document.getElementById('terceroNombre').value);
             formData.append('terceroTipoID', document.getElementById('terceroTipoID').value);
             formData.append('terceroDocumento', document.getElementById('terceroDocumento').value);
-            // Paso 4:
+            // Paso 4: Datos de Pago
             formData.append('cuentaOrigen', document.getElementById('cuentaOrigen').value);
             formData.append('cuentaDestino', document.getElementById('cuentaDestino').value);
             formData.append('referenciaPago', document.getElementById('referenciaPago').value);
@@ -166,6 +167,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (receiptImageInput && receiptImageInput.files.length > 0) {
                 formData.append('receiptImage', receiptImageInput.files[0]);
             }
+
             try {
                 const response = await fetch('/api/operation/register', {
                     method: 'POST',
@@ -173,7 +175,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     body: formData
                 });
                 const data = await response.json();
-                loadingOverlay.style.display = 'none';
+                if (loadingOverlay) loadingOverlay.style.display = 'none';
                 showToast(data.message, response.ok);
                 if (response.ok) {
                     operationsForm.reset();
@@ -181,7 +183,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 }
             } catch (error) {
                 console.error('Error:', error);
-                loadingOverlay.style.display = 'none';
+                if (loadingOverlay) loadingOverlay.style.display = 'none';
                 showToast('Error al conectar con el servidor', false);
             }
         });

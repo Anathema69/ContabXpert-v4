@@ -477,7 +477,7 @@ input[type="number"]::-webkit-outer-spin-button {
   .step-title {
     font-size: 0.8rem;
   }
-  
+
   /* Input groups */
   .input-group input,
   .input-group select {
@@ -576,7 +576,7 @@ input[type="number"]::-webkit-outer-spin-button {
     width: 80px;
     min-width: 50px;
   }
-  
+
   /* Contenido principal */
   .operations-content {
     width: calc(100% - 50px);
@@ -589,23 +589,23 @@ input[type="number"]::-webkit-outer-spin-button {
     align-items: flex-start;
     gap: 0.5rem;
   }
-  
+
   .btn-logout {
     font-size: 0.8rem;
     padding: 0.3rem 0.6rem;
   }
-  
+
   /* Formulario */
   .operations-form {
     padding: 1rem;
   }
-  
+
   .input-group input,
   .input-group select {
     padding: 0.5rem;
     font-size: 0.85rem;
   }
-  
+
   /* Botones */
   .btn-primary,
   .btn-secondary {
@@ -613,7 +613,7 @@ input[type="number"]::-webkit-outer-spin-button {
     max-width: 250px;
     margin: 0 auto;
   }
-  
+
   /* Títulos */
   .operations-section h2 {
     font-size: 1.2rem;
@@ -842,7 +842,7 @@ input[type="number"]::-webkit-outer-spin-button {
 
   #fechaPagoDia {
       max-width: 120px;
-      
+
   }
 
   #fechaPagoAnio{

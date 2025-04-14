@@ -4,13 +4,14 @@ const User = require('../models/User');
 const authMiddleware = require('../middleware/auth');
 const bcrypt = require('bcryptjs');
 const SALT_ROUNDS = 10;
+const Operation = require('../models/Operation');
+const ExcelJS = require('exceljs');
+
 // routes/admin.js
 
 
 
-const Operation = require('../models/Operation');
 
-const ExcelJS = require('exceljs');
 
 // Registro de nuevos usuarios desde el panel admin (requiere token y rol admin)
 // Ruta para registrar nuevos usuarios desde el panel admin
@@ -48,12 +49,22 @@ router.post('/register', authMiddleware, async (req, res) => {
 // Obtener lista de usuarios de tipo 'user'
 // Endpoint para obtener la lista de usuarios de tipo 'user'
 router.get('/users', authMiddleware, async (req, res) => {
-    if (!req.user || req.user.role !== 'admin'){
-        return res.status(403).json({ message: 'No autorizado' });
-    }
     try {
-        // Solo se consultan usuarios con rol 'user'
-        const users = await User.find({ role: 'user' }, { fullName: 1, email: 1 });
+        // Verifica que sea admin
+        if (!req.user || req.user.role !== 'admin') {
+            return res.status(403).json({ message: 'No autorizado' });
+        }
+
+        // Proyección: queremos email, role, fullName, telefono, docType, docNumber, direccion, date_last_update
+        // Excluyendo password y __v
+        const users = await User.find(
+            { role: 'user' }, // Filtra donde role es "user"
+            {
+                password: 0,
+                __v: 0
+            }
+        ).sort({ createdAt: -1 }); // si deseas ordenar de forma específica
+
         res.json(users);
     } catch (error) {
         console.error(error);
@@ -184,5 +195,6 @@ router.get('/report', authMiddleware, async (req, res) => {
         res.status(500).send('Error interno al generar reporte');
     }
 });
+
 
 module.exports = router;

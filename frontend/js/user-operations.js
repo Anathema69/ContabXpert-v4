@@ -1,10 +1,8 @@
-/*******************************************************
- * frontend/js/user-operations.js
- * Control del wizard de registro de operaciones,
- * cálculo del total y envío del formulario.
- *******************************************************/
 document.addEventListener('DOMContentLoaded', async () => {
     console.log('DOM loaded -> user-operations.js');
+
+    // Determinar si estamos en modo edición (detecta ?edit= en la query)
+    const isEditMode = window.location.search.includes('edit=');
 
     // 1. Verificar token, rol y userId
     const token = localStorage.getItem('token');
@@ -27,13 +25,20 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     }
 
-    // Overlays
+    // Configuración del toast y overlay de carga
     const loadingOverlay = document.getElementById('loadingOverlay');
-    const successOverlay = document.getElementById('successOverlay');
-    const errorOverlay = document.getElementById('errorOverlay');
-    const errorMessageEl = document.getElementById('errorMessage');
+    const toast = document.getElementById('toast');
+    function showToast(message, success = true) {
+        toast.textContent = message;
+        toast.className = 'toast show-toast ' + (success ? 'toast-success' : 'toast-error');
+        toast.style.display = 'block';
+        setTimeout(() => {
+            toast.classList.remove('show-toast');
+            toast.style.display = 'none';
+        }, 3000);
+    }
 
-    // Wizard y barra de progreso
+    // Wizard y barra de progreso (se asume que los elementos existen en el HTML)
     const steps = [
         document.getElementById('step1'),
         document.getElementById('step2'),
@@ -63,7 +68,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
     goToStep(0);
 
-    // Botones de navegación
+    // Botones de navegación (asegúrate de que los ids sean correctos en el HTML)
     const btnNext1 = document.getElementById('btnNext1');
     const btnNext2 = document.getElementById('btnNext2');
     const btnNext3 = document.getElementById('btnNext3');
@@ -77,7 +82,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (btnPrev3) btnPrev3.addEventListener('click', () => goToStep(1));
     if (btnPrev4) btnPrev4.addEventListener('click', () => goToStep(2));
 
-    // Cálculo del total: Total = (Monto * Cantidad) + Comisión
+    // Cálculo dinámico del Total (se actualiza al escribir en monto, cantidad o comisión)
     const montoInput = document.getElementById('monto');
     const cantidadInput = document.getElementById('cantidad');
     const comisionInput = document.getElementById('comision');
@@ -89,86 +94,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         const totalValue = (monto * cantidad) + comision;
         totalInput.value = totalValue.toFixed(2);
     }
-    montoInput.addEventListener('input', updateTotal);
-    cantidadInput.addEventListener('input', updateTotal);
-    comisionInput.addEventListener('input', updateTotal);
+    if (montoInput) montoInput.addEventListener('input', updateTotal);
+    if (cantidadInput) cantidadInput.addEventListener('input', updateTotal);
+    if (comisionInput) comisionInput.addEventListener('input', updateTotal);
 
-    // Envío del formulario
-    const operationsForm = document.getElementById('operationsForm');
-    if (operationsForm) {
-        operationsForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            loadingOverlay.style.display = 'flex';
-
-            const formData = new FormData();
-            // Paso 1
-            formData.append('canal', document.getElementById('canal').value);
-            formData.append('plataforma', document.getElementById('exchange').value);
-            formData.append('ordenNum', document.getElementById('ordenNum').value);
-            formData.append('tipoActivo', document.getElementById('tipoActivo').value);
-            formData.append('activo', document.getElementById('activo').value);
-            formData.append('moneda', document.getElementById('moneda').value);
-            formData.append('monto', montoInput.value);
-            formData.append('cantidad', cantidadInput.value);
-            formData.append('comision', comisionInput.value);
-            formData.append('total', totalInput.value);
-            // Fecha de operación (Paso 1)
-            formData.append('fechaPagoDia', document.getElementById('fechaPagoDia').value);
-            formData.append('fechaPagoMesHidden', document.getElementById('fechaPagoMesHidden').value);
-            formData.append('fechaPagoAnio', document.getElementById('fechaPagoAnio').value);
-            // Paso 2
-            formData.append('titularNombre', document.getElementById('titularNombre').value);
-            formData.append('titularTipoID', document.getElementById('titularTipoID').value);
-            formData.append('titularDocumento', document.getElementById('titularDocumento').value);
-            formData.append('titularDireccion', document.getElementById('titularDireccion').value);
-            // Paso 3
-            formData.append('terceroNombre', document.getElementById('terceroNombre').value);
-            formData.append('terceroTipoID', document.getElementById('terceroTipoID').value);
-            formData.append('terceroDocumento', document.getElementById('terceroDocumento').value);
-            // Paso 4
-            formData.append('cuentaOrigen', document.getElementById('cuentaOrigen').value);
-            formData.append('cuentaDestino', document.getElementById('cuentaDestino').value);
-            formData.append('referenciaPago', document.getElementById('referenciaPago').value);
-            formData.append('estadoPago', document.getElementById('estadoPago').value);
-            const receiptImageInput = document.getElementById('receiptImage');
-            if (receiptImageInput && receiptImageInput.files.length > 0) {
-                formData.append('receiptImage', receiptImageInput.files[0]);
-            }
-            try {
-                const response = await fetch('/api/operation/register', {
-                    method: 'POST',
-                    headers: { 'Authorization': `Bearer ${token}` },
-                    body: formData
-                });
-                const data = await response.json();
-                loadingOverlay.style.display = 'none';
-                if (response.ok) {
-                    successOverlay.style.display = 'flex';
-                    setTimeout(() => {
-                        successOverlay.style.display = 'none';
-                    }, 3000);
-                    operationsForm.reset();
-                    goToStep(0);
-                } else {
-                    errorMessageEl.textContent = data.message || 'Error desconocido';
-                    errorOverlay.style.display = 'flex';
-                    setTimeout(() => {
-                        errorOverlay.style.display = 'none';
-                    }, 3000);
-                }
-            } catch (error) {
-                console.error('Error:', error);
-                loadingOverlay.style.display = 'none';
-                errorMessageEl.textContent = 'Error al conectar con el servidor';
-                errorOverlay.style.display = 'flex';
-                setTimeout(() => {
-                    errorOverlay.style.display = 'none';
-                }, 3000);
-            }
-        });
-    }
-
-    // Configuración del selector de mes para la fecha
+    // Configuración del selector de mes para la Fecha de operación
     const fechaPagoMonthSelect = document.querySelector('.custom-month-select');
     if (fechaPagoMonthSelect) {
         const fechaPagoMonthTrigger = fechaPagoMonthSelect.querySelector('.custom-month-trigger');
@@ -192,6 +122,67 @@ document.addEventListener('DOMContentLoaded', async () => {
         document.addEventListener('click', (e) => {
             if (!fechaPagoMonthSelect.contains(e.target)) {
                 fechaPagoMonthDropdown.classList.remove('open');
+            }
+        });
+    }
+
+    // Si no estamos en modo edición, asignar submit handler para crear la operación
+    const operationsForm = document.getElementById('operationsForm');
+    if (operationsForm && !isEditMode) {
+        operationsForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            loadingOverlay.style.display = 'flex';
+
+            const formData = new FormData();
+            // Paso 1: Recopilar datos. Nota: El campo "Exchange" se envía como plataforma.
+            formData.append('canal', document.getElementById('canal').value);
+            formData.append('plataforma', document.getElementById('exchange').value);
+            formData.append('ordenNum', document.getElementById('ordenNum').value);
+            formData.append('tipoActivo', document.getElementById('tipoActivo').value);
+            formData.append('activo', document.getElementById('activo').value);
+            formData.append('moneda', document.getElementById('moneda').value);
+            formData.append('monto', montoInput.value);
+            formData.append('cantidad', cantidadInput.value);
+            formData.append('comision', comisionInput.value);
+            formData.append('total', totalInput.value);
+            formData.append('fechaPagoDia', document.getElementById('fechaPagoDia').value);
+            formData.append('fechaPagoMesHidden', document.getElementById('fechaPagoMesHidden').value);
+            formData.append('fechaPagoAnio', document.getElementById('fechaPagoAnio').value);
+            // Paso 2:
+            formData.append('titularNombre', document.getElementById('titularNombre').value);
+            formData.append('titularTipoID', document.getElementById('titularTipoID').value);
+            formData.append('titularDocumento', document.getElementById('titularDocumento').value);
+            formData.append('titularDireccion', document.getElementById('titularDireccion').value);
+            // Paso 3:
+            formData.append('terceroNombre', document.getElementById('terceroNombre').value);
+            formData.append('terceroTipoID', document.getElementById('terceroTipoID').value);
+            formData.append('terceroDocumento', document.getElementById('terceroDocumento').value);
+            // Paso 4:
+            formData.append('cuentaOrigen', document.getElementById('cuentaOrigen').value);
+            formData.append('cuentaDestino', document.getElementById('cuentaDestino').value);
+            formData.append('referenciaPago', document.getElementById('referenciaPago').value);
+            formData.append('estadoPago', document.getElementById('estadoPago').value);
+            const receiptImageInput = document.getElementById('receiptImage');
+            if (receiptImageInput && receiptImageInput.files.length > 0) {
+                formData.append('receiptImage', receiptImageInput.files[0]);
+            }
+            try {
+                const response = await fetch('/api/operation/register', {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${token}` },
+                    body: formData
+                });
+                const data = await response.json();
+                loadingOverlay.style.display = 'none';
+                showToast(data.message, response.ok);
+                if (response.ok) {
+                    operationsForm.reset();
+                    goToStep(0);
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                loadingOverlay.style.display = 'none';
+                showToast('Error al conectar con el servidor', false);
             }
         });
     }

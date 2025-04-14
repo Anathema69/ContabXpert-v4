@@ -181,8 +181,8 @@
         <div class="input-group" id="fecha-group" style="margin-top: 1rem;">
           <label for="fechaPagoDia" style="width:100%;">Fecha de operación</label>
           <div class="date-separate" style="display: flex; gap:5px; width:100%;">
-            <input type="text" id="fechaPagoDia" placeholder="DD" class="date-input" maxlength="2" style="flex:1;">
-            <div class="custom-month-select" style="flex:2;">
+            <input type="text" id="fechaPagoDia" placeholder="DD" class="date-input" maxlength="2">
+            <div class="custom-month-select">
               <button type="button" class="custom-month-trigger">
                 <span id="selectedFechaPagoMes">Mes</span>
               </button>
@@ -201,7 +201,7 @@
                 <button type="button" data-value="12">Diciembre</button>
               </div>
             </div>
-            <input type="text" id="fechaPagoAnio" placeholder="AAAA" class="date-input" maxlength="4" style="flex:1;">
+            <input type="text" id="fechaPagoAnio" placeholder="AAAA" class="date-input" maxlength="4">
             <input type="hidden" id="fechaPagoMesHidden">
           </div>
         </div>
@@ -279,7 +279,6 @@
         <h3>Datos de Pago</h3>
         <div class="input-group">
           <label for="cuentaOrigen">Cuenta Origen:</label>
-          <!-- Ahora es un input numérico editable -->
           <input type="number" id="cuentaOrigen" placeholder="Ingrese su cuenta de origen" required>
         </div>
         <div class="input-group">
@@ -328,6 +327,8 @@
   </div>
 </div>
 
+<!-- Se incluyen ambos scripts: el script principal del wizard y el de edición (para precargar en modo edit) -->
 <script src="js/user-operations.js"></script>
+<script src="js/user-operation-edit.js"></script>
 </body>
 </html>

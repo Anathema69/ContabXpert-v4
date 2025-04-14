@@ -143,10 +143,8 @@ router.put('/edit/:id', authMiddleware, upload.single('receiptImage'), async (re
         if (operation.userId.toString() !== req.user.id && req.user.role !== 'admin') {
             return res.status(403).json({ message: 'No autorizado' });
         }
-
         const {
             canal,
-            plataforma,
             ordenNum,
             tipoActivo,
             activo,
@@ -168,23 +166,22 @@ router.put('/edit/:id', authMiddleware, upload.single('receiptImage'), async (re
             fechaPagoDia,
             fechaPagoMesHidden,
             fechaPagoAnio,
-            cuentaOrigen
+            cuentaOrigen,
+            plataforma
         } = req.body;
-
         let receiptImagePath = operation.receiptImage;
         if (req.file) {
             receiptImagePath = req.file.path;
         }
-
         let fecha;
         if (fechaPagoDia && fechaPagoMesHidden && fechaPagoAnio) {
             fecha = new Date(`${fechaPagoAnio}-${fechaPagoMesHidden.padStart(2, '0')}-${fechaPagoDia.padStart(2, '0')}`);
         } else {
             fecha = operation.fecha;
         }
-
         const updatedData = {
             canal,
+            // Aquí se actualiza el campo 'plataforma' (que en el frontend se muestra como Exchange)
             plataforma,
             ordenNum: ordenNum ? parseInt(ordenNum) : operation.ordenNum,
             tipoActivo,
@@ -205,10 +202,9 @@ router.put('/edit/:id', authMiddleware, upload.single('receiptImage'), async (re
             referenciaPago,
             estadoPago,
             fecha,
-            cuentaOrigen, // Campo editable para la cuenta de origen (número)
+            cuentaOrigen,
             receiptImage: receiptImagePath
         };
-
         const updatedOperation = await Operation.findByIdAndUpdate(opId, updatedData, { new: true });
         res.json({ message: 'Operación actualizada correctamente', operation: updatedOperation });
     } catch (error) {
@@ -216,5 +212,6 @@ router.put('/edit/:id', authMiddleware, upload.single('receiptImage'), async (re
         res.status(500).json({ message: 'Error al actualizar la operación' });
     }
 });
+
 
 module.exports = router;

@@ -198,9 +198,9 @@ body {
 
 /* Modal Styles */
 .modal {
-    display: none;
+    display: none; /* Se muestra solo al activarlo */
     position: fixed;
-    z-index: 20;
+    z-index: 1000;
     left: 0;
     top: 0;
     width: 100%;
@@ -210,31 +210,71 @@ body {
 }
 
 .modal-content {
-    background: #ffffff;
+    background: #fff;
     margin: 10% auto;
-    padding: 2rem;
-    border: 1px solid var(--color-gold-primary);
-    border-radius: 12px;
-    width: 80%;
-    max-width: 600px;
-    position: relative;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-    color: var(--color-silver-dark);
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    width: 90%;
+    max-width: 400px;
+    text-align: center;
 }
 
 .modal-close {
-    color: var(--color-gold-primary);
-    position: absolute;
-    top: 10px;
-    right: 10px;
+    color: #aaa;
+    float: right;
     font-size: 28px;
     font-weight: bold;
     cursor: pointer;
-    transition: var(--transition-smooth);
 }
 
-.modal-close:hover {
-    color: var(--color-gold-dark);
+.modal-close:hover,
+.modal-close:focus {
+    color: #000;
+}
+
+.modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 15px;
+}
+
+.modal-icon {
+    width: 30px;
+    height: 30px;
+    margin-right: 10px;
+}
+
+.modal-actions {
+    margin-top: 20px;
+    display: flex;
+    justify-content: space-around;
+}
+
+.btn-secondary {
+    background-color: #ccc;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.btn-secondary:hover {
+    background-color: #bbb;
+}
+
+.btn-danger {
+    background-color: #d9534f;
+    border: none;
+    color: #fff;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.btn-danger:hover {
+    background-color: #c9302c;
 }
 
 /* Estilos de tarjeta para vista móvil */

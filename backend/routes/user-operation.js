@@ -213,5 +213,29 @@ router.put('/edit/:id', authMiddleware, upload.single('receiptImage'), async (re
     }
 });
 
+// Ruta para "eliminar" (soft delete) una operación: cambia hidden a true
+router.put('/delete/:id', authMiddleware, async (req, res) => {
+    try {
+        const opId = req.params.id;
+        // Buscar la operación a eliminar
+        const operation = await Operation.findById(opId);
+        if (!operation) {
+            return res.status(404).json({ message: 'Operación no encontrada' });
+        }
+        // Verificar permisos: solo el propio usuario o admin puede eliminar
+        if (operation.userId.toString() !== req.user.id && req.user.role !== 'admin') {
+            return res.status(403).json({ message: 'No autorizado' });
+        }
+        // Actualizar el campo hidden a true
+        operation.hidden = true;
+        await operation.save();
+        res.json({ message: 'Registro eliminado correctamente' });
+    } catch (error) {
+        console.error('Error al eliminar la operación:', error);
+        res.status(500).json({ message: 'Error interno al eliminar el registro' });
+    }
+});
+
+
 
 module.exports = router;

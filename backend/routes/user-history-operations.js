@@ -25,7 +25,7 @@ router.get('/', authMiddleware, async (req, res) => {
 
         // Busca todas las operaciones de ese userId
         // Ordenadas por fecha de creación descendente
-        const operations = await Operation.find({ userId }).sort({ createdAt: -1 });
+        const operations = await Operation.find({ userId, hidden: false }).sort({ createdAt: -1 });
 
         return res.json(operations);
     } catch (error) {

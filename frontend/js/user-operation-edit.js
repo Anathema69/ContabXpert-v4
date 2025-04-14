@@ -2,7 +2,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Detectar el parámetro "edit" en la URL
     const params = new URLSearchParams(window.location.search);
     const editOpId = params.get('edit');
-    if (!editOpId) return; // No se activa el modo edición si no se pasa el parámetro
+    if (!editOpId) return; // Si no se pasa el parámetro, no se activa el modo edición
 
     // Cambiar el encabezado del formulario y el texto del botón
     const formHeader = document.querySelector('.operations-form h3');
@@ -14,7 +14,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         submitBtn.textContent = 'Actualizar Operación';
     }
 
-    // Función para mostrar toast
+    // Función para mostrar notificaciones tipo toast
     const toast = document.getElementById('toast');
     function showToast(message, success = true) {
         toast.textContent = message;
@@ -26,14 +26,14 @@ document.addEventListener('DOMContentLoaded', async () => {
         }, 3000);
     }
 
-    // Obtener token y redirigir si no existe
+    // Obtener token y redirigir si no se encuentra
     const token = localStorage.getItem('token');
     if (!token) {
         window.location.href = 'index.html';
         return;
     }
 
-    // Cargar los datos de la operación a editar
+    // Cargar los datos de la operación a editar mediante la API
     try {
         const resp = await fetch(`/api/operation/${editOpId}`, {
             headers: {
@@ -46,9 +46,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
         const op = await resp.json();
 
-        // Pre-cargar campos del Paso 1
+        // Pre-cargar los campos del Paso 1
         document.getElementById('canal').value = op.canal || '';
-        // Precargar el campo "Exchange" usando el campo "plataforma" (normalizamos a mayúsculas para que coincida con las opciones)
+        // Precargar el campo "Exchange" usando el valor del campo "plataforma"
         if (op.plataforma) {
             document.getElementById('exchange').value = op.plataforma.toUpperCase();
         } else {
@@ -61,7 +61,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         document.getElementById('monto').value = op.monto || '';
         document.getElementById('cantidad').value = op.cantidad || '';
         document.getElementById('comision').value = op.comision || '';
-        // Invocar updateTotal para recalcular el total con los valores precargados
+        document.getElementById('total').value = op.total || '';
+
+        // Actualizar el total (si alguno de estos inputs cambia, ya se tienen los listeners en el otro script)
         const montoInput = document.getElementById('monto');
         const cantidadInput = document.getElementById('cantidad');
         const comisionInput = document.getElementById('comision');
@@ -75,7 +77,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
         updateTotal();
 
-        // Configurar el campo Fecha de operación (Paso 1)
+        // Configurar el campo Fecha de operación
         if (op.fecha) {
             const opDate = new Date(op.fecha);
             const dia = String(opDate.getDate()).padStart(2, '0');
@@ -88,35 +90,40 @@ document.addEventListener('DOMContentLoaded', async () => {
             document.getElementById('fechaPagoAnio').value = anio;
         }
 
-        // Paso 2: Titular Exchange
+        // Pre-cargar datos del Paso 2: Titular Exchange
         document.getElementById('titularNombre').value = op.titularNombre || '';
         document.getElementById('titularTipoID').value = op.titularTipoID || '';
         document.getElementById('titularDocumento').value = op.titularDocumento || '';
         document.getElementById('titularDireccion').value = op.titularDireccion || '';
 
-        // Paso 3: Tercero/Pago
+        // Pre-cargar datos del Paso 3: Tercero/Pago
         document.getElementById('terceroNombre').value = op.terceroNombre || '';
         document.getElementById('terceroTipoID').value = op.terceroTipoID || '';
         document.getElementById('terceroDocumento').value = op.terceroDocumento || '';
 
-        // Paso 4: Datos de Pago
+        // Pre-cargar datos del Paso 4: Datos de Pago
         document.getElementById('cuentaOrigen').value = op.cuentaOrigen || '';
         document.getElementById('cuentaDestino').value = op.cuentaDestino || '';
         document.getElementById('referenciaPago').value = op.referenciaPago || '';
         document.getElementById('estadoPago').value = op.estadoPago || '';
-        // No precargar el campo de constancia para permitir subir uno nuevo
+        // No precargar el campo de constancia para que el usuario pueda subir uno nuevo si lo desea
+
     } catch (error) {
         console.error('Error al cargar operación para edición:', error);
         showToast('Error al cargar los datos de la operación', false);
     }
 
-    // Asignar el submit handler para actualizar la operación (PUT)
+    // Asignar submit handler para actualizar la operación (PUT)
     const operationsForm = document.getElementById('operationsForm');
     if (operationsForm) {
         operationsForm.addEventListener('submit', async (e) => {
             e.preventDefault();
+            // Deshabilitar el botón para evitar clics múltiples
+            submitBtn.disabled = true;
+
             const loadingOverlay = document.getElementById('loadingOverlay');
             loadingOverlay.style.display = 'flex';
+
             const formData = new FormData();
             // Paso 1
             formData.append('canal', document.getElementById('canal').value);
@@ -159,17 +166,29 @@ document.addEventListener('DOMContentLoaded', async () => {
                 const data = await response.json();
                 loadingOverlay.style.display = 'none';
                 if (response.ok) {
-                    showToast('Operación actualizada con éxito', true);
-                    setTimeout(() => {
-                        window.location.href = 'user-history-operations.html';
-                    }, 1000);
+                    // Mostrar notificación de éxito y redirigir
+                    const successOverlay = document.getElementById('successOverlay');
+                    if (successOverlay) {
+                        successOverlay.style.display = 'flex';
+                        setTimeout(() => {
+                            window.location.href = 'user-history-operations.html';
+                        }, 1500);
+                    } else {
+                        showToast('Operación actualizada con éxito', true);
+                        setTimeout(() => {
+                            window.location.href = 'user-history-operations.html';
+                        }, 1500);
+                    }
                 } else {
                     showToast(data.message || 'Error al actualizar la operación', false);
+                    // Rehabilitar el botón en caso de error
+                    submitBtn.disabled = false;
                 }
             } catch (error) {
                 console.error('Error en actualización:', error);
                 loadingOverlay.style.display = 'none';
                 showToast('Error al conectar con el servidor', false);
+                submitBtn.disabled = false;
             }
         });
     }

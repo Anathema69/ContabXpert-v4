@@ -82,7 +82,27 @@
         <div id="toast" class="toast" style="display: none;"></div>
     </main>
 </div>
+
+<!-- Modal de confirmación para eliminar registro -->
+<div id="deleteConfirmModal" class="modal" style="display: none;">
+    <div class="modal-content">
+        <span class="modal-close">&times;</span>
+        <div class="modal-header">
+            <img src="icon/warning.png" alt="Advertencia" class="modal-icon">
+            <h2>Confirmar Eliminación</h2>
+        </div>
+        <p>¿Estás seguro de eliminar este registro? Esta acción lo retirará del historial pero se conservará internamente.</p>
+        <div class="modal-actions">
+            <button id="cancelDeleteBtn" class="btn-secondary">Cancelar</button>
+            <button id="confirmDeleteBtn" class="btn-danger">Eliminar</button>
+        </div>
+    </div>
+</div>
+
+
 <script src="js/user-history-operations.js"></script>
 <script src="js/user-operation-edit.js"></script>
+<script src="js/user-operation-delete.js"></script>
+
 </body>
 </html>

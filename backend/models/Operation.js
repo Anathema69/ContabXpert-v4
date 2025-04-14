@@ -43,7 +43,7 @@ const OperationSchema = new mongoose.Schema({
     // NUEVO: campo para "borrado fantasma"
     hidden: {
         type: Boolean,
-        default: true
+        default: false
     }
 }, { timestamps: true });
 

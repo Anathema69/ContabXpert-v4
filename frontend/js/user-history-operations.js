@@ -181,14 +181,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 });
             });
 
-            // Funcionalidad placeholder para "Eliminar"
-            const deleteButtons = document.querySelectorAll('.delete-btn');
-            deleteButtons.forEach(btn => {
-                btn.addEventListener('click', () => {
-                    const opId = btn.getAttribute('data-op-id');
-                    alert(`Función de eliminar aún no implementada para la operación ${opId}`);
-                });
-            });
+
 
         } catch (error) {
             console.error('Error al cargar operaciones:', error);

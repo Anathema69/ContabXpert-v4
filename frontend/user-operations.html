@@ -69,6 +69,35 @@
       <!-- Paso 1: Datos de la Orden/Comercio + Activo/Moneda + Cálculos + Fecha -->
       <div class="step-content" id="step1">
         <h3>Datos de la Orden/Comercio</h3>
+        <!-- Sección 4: Fecha de operación (ocupando ancho completo) -->
+        <div class="input-group" id="fecha-group" style="margin-top: 1rem;">
+          <h3 for="fechaPagoDia" style="width:100%;">Fecha de operación</h3>
+          <div class="date-separate" style="display: flex; gap:5px; width:100%;">
+            <input type="text" id="fechaPagoDia" placeholder="DD" class="date-input" maxlength="2">
+            <div class="custom-month-select">
+              <button type="button" class="custom-month-trigger">
+                <span id="selectedFechaPagoMes">Mes</span>
+              </button>
+              <div class="custom-month-dropdown">
+                <button type="button" data-value="1">Enero</button>
+                <button type="button" data-value="2">Febrero</button>
+                <button type="button" data-value="3">Marzo</button>
+                <button type="button" data-value="4">Abril</button>
+                <button type="button" data-value="5">Mayo</button>
+                <button type="button" data-value="6">Junio</button>
+                <button type="button" data-value="7">Julio</button>
+                <button type="button" data-value="8">Agosto</button>
+                <button type="button" data-value="9">Septiembre</button>
+                <button type="button" data-value="10">Octubre</button>
+                <button type="button" data-value="11">Noviembre</button>
+                <button type="button" data-value="12">Diciembre</button>
+              </div>
+            </div>
+            <input type="text" id="fechaPagoAnio" placeholder="AAAA" class="date-input" maxlength="4">
+            <input type="hidden" id="fechaPagoMesHidden">
+          </div>
+        </div>
+
         <!-- Sección 1: Datos de la Orden -->
         <div class="sub-section">
           <h4>Datos de la Orden</h4>
@@ -157,7 +186,7 @@
         <div class="two-columns">
           <div class="column">
             <div class="input-group">
-              <label for="monto">Monto:</label>
+              <label for="monto">Precio:</label>
               <input type="number" step="0.01" id="monto" placeholder="Ej. 10.50" required>
             </div>
             <div class="input-group">
@@ -177,34 +206,7 @@
           </div>
         </div>
 
-        <!-- Sección 4: Fecha de operación (ocupando ancho completo) -->
-        <div class="input-group" id="fecha-group" style="margin-top: 1rem;">
-          <label for="fechaPagoDia" style="width:100%;">Fecha de operación</label>
-          <div class="date-separate" style="display: flex; gap:5px; width:100%;">
-            <input type="text" id="fechaPagoDia" placeholder="DD" class="date-input" maxlength="2">
-            <div class="custom-month-select">
-              <button type="button" class="custom-month-trigger">
-                <span id="selectedFechaPagoMes">Mes</span>
-              </button>
-              <div class="custom-month-dropdown">
-                <button type="button" data-value="1">Enero</button>
-                <button type="button" data-value="2">Febrero</button>
-                <button type="button" data-value="3">Marzo</button>
-                <button type="button" data-value="4">Abril</button>
-                <button type="button" data-value="5">Mayo</button>
-                <button type="button" data-value="6">Junio</button>
-                <button type="button" data-value="7">Julio</button>
-                <button type="button" data-value="8">Agosto</button>
-                <button type="button" data-value="9">Septiembre</button>
-                <button type="button" data-value="10">Octubre</button>
-                <button type="button" data-value="11">Noviembre</button>
-                <button type="button" data-value="12">Diciembre</button>
-              </div>
-            </div>
-            <input type="text" id="fechaPagoAnio" placeholder="AAAA" class="date-input" maxlength="4">
-            <input type="hidden" id="fechaPagoMesHidden">
-          </div>
-        </div>
+
 
         <!-- Botón para pasar al siguiente paso -->
         <div class="buttons-group" style="margin-top: 2rem;">

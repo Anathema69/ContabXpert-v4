@@ -1,3 +1,9 @@
+/************************************************
+ * frontend/js/user-panel.js
+ * Actualización de datos complementarios del usuario,
+ * con los nuevos campos para tipo y número de documento
+ * y la dirección.
+ ************************************************/
 document.addEventListener('DOMContentLoaded', () => {
     const token = localStorage.getItem('token');
     const role = localStorage.getItem('role');
@@ -14,6 +20,7 @@ document.addEventListener('DOMContentLoaded', () => {
         userNameEl.textContent = `Bienvenido: ${storedFullName}`;
     }
 
+    // Navegación de la barra lateral
     const btnDatos = document.getElementById('btnDatos');
     if (btnDatos) {
         btnDatos.addEventListener('click', () => {
@@ -40,8 +47,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const datosForm = document.getElementById('datosForm');
     const loadingOverlay = document.getElementById('loadingOverlay');
     const toast = document.getElementById('toast');
-    const countryCodeSelect = document.getElementById('countryCode');
-    const countryFlagImg = document.getElementById('countryFlag');
 
     function showToast(message, success = true) {
         toast.textContent = message;
@@ -53,6 +58,9 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 3000);
     }
 
+    // Manejo del selector del código de país y bandera
+    const countryCodeSelect = document.getElementById('countryCode');
+    const countryFlagImg = document.getElementById('countryFlag');
     if (countryCodeSelect) {
         countryCodeSelect.addEventListener('change', () => {
             const selectedOption = countryCodeSelect.options[countryCodeSelect.selectedIndex];
@@ -63,35 +71,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Manejo del selector personalizado para el mes de nacimiento
-    const monthTrigger = document.querySelector('.custom-month-trigger');
-    const monthDropdown = document.querySelector('.custom-month-dropdown');
-    const monthButtons = document.querySelectorAll('.custom-month-dropdown button');
-    const selectedMonth = document.getElementById('selectedBirthMonth');
-    const hiddenMonthInput = document.getElementById('birthMesHidden');
-
-    if (monthTrigger) {
-        monthTrigger.addEventListener('click', function() {
-            monthDropdown.classList.toggle('open');
-        });
-    }
-    monthButtons.forEach(button => {
-        button.addEventListener('click', function() {
-            const monthValue = this.getAttribute('data-value');
-            const monthName = this.textContent;
-            selectedMonth.textContent = monthName;
-            hiddenMonthInput.value = monthValue;
-            monthDropdown.classList.remove('open');
-        });
-    });
-    document.addEventListener('click', function(event) {
-        if (!monthTrigger.contains(event.target) && !monthDropdown.contains(event.target)) {
-            monthDropdown.classList.remove('open');
-        }
-    });
-
-    // Envío del formulario para actualizar datos del usuario,
-    // enviando los campos separados para la fecha de nacimiento.
+    // Envío del formulario de actualización
     datosForm.addEventListener('submit', async (e) => {
         e.preventDefault();
         if (!userId || !token) {
@@ -99,19 +79,18 @@ document.addEventListener('DOMContentLoaded', () => {
             window.location.href = 'index.html';
             return;
         }
+
         loadingOverlay.style.display = 'flex';
 
         const fullName = document.getElementById('fullName').value.trim();
-        const code = document.getElementById('countryCode').value;
-        const phoneNum = document.getElementById('phoneNumber').value.trim();
-        const accountNumber = document.getElementById('accountNumber').value.trim();
+        const countryCode = document.getElementById('countryCode').value;
+        const phoneNumber = document.getElementById('phoneNumber').value.trim();
+        const telefono = `${countryCode} ${phoneNumber}`;
 
-        // Recopila los valores separados para la fecha
-        const birthDia = document.getElementById('birthDia').value.trim();
-        const birthMesHidden = document.getElementById('birthMesHidden').value.trim();
-        const birthAnio = document.getElementById('birthAnio').value.trim();
-
-        const telefono = `${code} ${phoneNum}`;
+        // Nuevos campos: docType, docNumber y direccion
+        const docType = document.getElementById('docType').value;
+        const docNumber = document.getElementById('docNumber').value.trim();
+        const direccion = document.getElementById('direccion').value.trim();
 
         try {
             const response = await fetch(`/api/user/update/${userId}`, {
@@ -123,22 +102,20 @@ document.addEventListener('DOMContentLoaded', () => {
                 body: JSON.stringify({
                     fullName,
                     telefono,
-                    accountNumber,
-                    birthDia,
-                    birthMesHidden,
-                    birthAnio
+                    docType,
+                    docNumber,
+                    direccion
                 })
             });
-
             const data = await response.json();
             loadingOverlay.style.display = 'none';
-
             if (response.ok) {
                 localStorage.setItem('fullName', fullName);
                 if (userNameEl) {
                     userNameEl.textContent = `Bienvenido: ${fullName}`;
                 }
                 datosForm.reset();
+                // Restablece el código de país y bandera a valores por defecto
                 countryCodeSelect.value = '+57';
                 countryFlagImg.src = 'icon/flags/co.png';
                 showToast(data.message, true);

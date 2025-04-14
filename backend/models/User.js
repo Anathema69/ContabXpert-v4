@@ -5,14 +5,13 @@ const UserSchema = new mongoose.Schema({
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true },
     role: { type: String, enum: ['admin', 'user'], default: 'user' },
-
-    // Campos que quieres almacenar:
     fullName: { type: String },
-    telefono: { type: String },         // Ej. "+51 957111067"
-    accountNumber: { type: Number },
-    //moneda: { type: String },           // Si quieres seguir guardando la moneda
-    birthDate: { type: Date },          // Fecha de nacimiento
-    date_last_update: { type: Date }    // Fecha de la última modificación
+    telefono: { type: String },
+    // Nuevos campos:
+    docType: { type: String },     // Ej: DNI, CE, PASAPORTE, etc.
+    docNumber: { type: String },   // Campo alfanumérico para el número de documento
+    direccion: { type: String },   // Dirección del usuario
+    date_last_update: { type: Date }
 }, {
     collection: 'users'
 });

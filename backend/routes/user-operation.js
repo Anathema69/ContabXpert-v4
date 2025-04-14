@@ -1,16 +1,13 @@
-/************************************************
- * backend/routes/user-operation.js
- ************************************************/
+// backend/routes/user-operation.js
 const express = require('express');
 const router = express.Router();
 const path = require('path');
 const multer = require('multer');
 const authMiddleware = require('../middleware/auth');
-
 const Operation = require('../models/Operation');
 const User = require('../models/User');
 
-// Configuración de Multer para guardar archivos en /uploads
+// Configuración de multer para subir imágenes (constancia)
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
         cb(null, 'uploads/');
@@ -23,7 +20,6 @@ const storage = multer.diskStorage({
         cb(null, newFilename);
     }
 });
-
 const upload = multer({
     storage: storage,
     fileFilter: (req, file, cb) => {
@@ -35,123 +31,190 @@ const upload = multer({
     }
 });
 
-/**
- * POST /api/operation/register
- * Registra una operación.
- * Se espera que la fecha de operación se envíe en tres campos:
- * - fechaPagoDia
- * - fechaPagoMesHidden  (valor numérico: 1-12)
- * - fechaPagoAnio
- */
-router.post(
-    '/register',
-    authMiddleware,
-    upload.single('receiptImage'),
-    async (req, res) => {
-        try {
-            const userId = req.user.id;
-            // Verifica que el usuario exista
-            const user = await User.findById(userId);
-            if (!user) {
-                return res.status(404).json({ message: 'Usuario no encontrado' });
-            }
-
-            // Extraer campos del body
-            const {
-                canal,
-                plataforma,
-                ordenNum,
-                tipoActivo,
-                activo,
-                moneda,
-                monto,
-                cantidad,
-                total,
-                comision,
-                titularNombre,
-                titularTipoID,
-                titularDocumento,
-                titularDireccion,
-                terceroNombre,
-                terceroTipoID,
-                terceroDocumento,
-                cuentaOrigen,
-                cuentaDestino,
-                referenciaPago,
-                estadoPago,
-                fechaPagoDia,
-                fechaPagoMesHidden,
-                fechaPagoAnio
-            } = req.body;
-
-            // Verificar que se han enviado los tres campos de fecha
-            if (
-                !fechaPagoDia || fechaPagoDia.trim() === '' ||
-                !fechaPagoMesHidden || fechaPagoMesHidden.trim() === '' ||
-                !fechaPagoAnio || fechaPagoAnio.trim() === ''
-            ) {
-                return res.status(400).json({
-                    message: 'Debe ingresar día, mes y año para la fecha de operación.'
-                });
-            }
-
-            const day = parseInt(fechaPagoDia, 10);
-            const month = parseInt(fechaPagoMesHidden, 10);
-            const year = parseInt(fechaPagoAnio, 10);
-
-            if (isNaN(day) || isNaN(month) || isNaN(year)) {
-                return res.status(400).json({
-                    message: 'Valores de fecha de operación inválidos.'
-                });
-            }
-
-            // Armar la fecha (recordar que en JS mes: 0 = enero, etc.)
-            const finalDate = new Date(year, month - 1, day);
-            console.log('Fecha de operación armada:', finalDate);
-
-            // Procesar la imagen (si la hay)
-            let receiptImagePath = null;
-            if (req.file) {
-                receiptImagePath = req.file.path;
-                console.log('receiptImagePath:', receiptImagePath);
-            }
-
-            // Crear la operación; el campo hidden se establece en true por defecto.
-            const newOperation = new Operation({
-                userId,
-                canal,
-                plataforma,
-                ordenNum: ordenNum ? parseInt(ordenNum) : null,
-                tipoActivo,
-                activo,
-                moneda,
-                monto: monto ? parseFloat(monto) : null,
-                cantidad: cantidad ? parseFloat(cantidad) : null,
-                total: total ? parseFloat(total) : null,
-                comision: comision ? parseFloat(comision) : null,
-                titularNombre,
-                titularTipoID,
-                titularDocumento,
-                titularDireccion,
-                terceroNombre,
-                terceroTipoID,
-                terceroDocumento,
-                cuentaOrigen,
-                cuentaDestino,
-                referenciaPago,
-                estadoPago,
-                fecha: finalDate,
-                receiptImage: receiptImagePath,
-                hidden: true
-            });
-
-            await newOperation.save();
-            return res.json({ message: 'Operación registrada correctamente' });
-        } catch (error) {
-            console.error('Error en POST /api/operation/register:', error);
-            return res.status(500).json({ message: 'Error al registrar la operación' });
+// POST /api/operation/register -> Registro de nueva operación
+router.post('/register', authMiddleware, upload.single('receiptImage'), async (req, res) => {
+    try {
+        const userId = req.user.id;
+        const user = await User.findById(userId);
+        if (!user) {
+            return res.status(404).json({ message: 'Usuario no encontrado' });
         }
+
+        const {
+            canal,
+            plataforma,
+            ordenNum,
+            tipoActivo,
+            activo,
+            moneda,
+            monto,
+            cantidad,
+            total,
+            comision,
+            titularNombre,
+            titularTipoID,
+            titularDocumento,
+            titularDireccion,
+            terceroNombre,
+            terceroTipoID,
+            terceroDocumento,
+            cuentaDestino,
+            referenciaPago,
+            estadoPago,
+            fechaPagoDia,
+            fechaPagoMesHidden,
+            fechaPagoAnio
+        } = req.body;
+
+        let receiptImagePath = null;
+        if (req.file) {
+            receiptImagePath = req.file.path;
+        }
+
+        // Construir la fecha a partir de los tres inputs
+        let fecha;
+        if (fechaPagoDia && fechaPagoMesHidden && fechaPagoAnio) {
+            fecha = new Date(`${fechaPagoAnio}-${fechaPagoMesHidden.padStart(2, '0')}-${fechaPagoDia.padStart(2, '0')}`);
+        } else {
+            fecha = new Date();
+        }
+
+        const newOperation = new Operation({
+            userId,
+            canal,
+            plataforma,
+            ordenNum: ordenNum ? parseInt(ordenNum) : null,
+            tipoActivo,
+            activo,
+            moneda,
+            monto: monto ? parseFloat(monto) : null,
+            cantidad: cantidad ? parseFloat(cantidad) : null,
+            total: total ? parseFloat(total) : null,
+            comision: comision ? parseFloat(comision) : null,
+            titularNombre,
+            titularTipoID,
+            titularDocumento,
+            titularDireccion,
+            terceroNombre,
+            terceroTipoID,
+            terceroDocumento,
+            cuentaDestino,
+            referenciaPago,
+            estadoPago,
+            fecha,
+            receiptImage: receiptImagePath,
+            hidden: true // Valor por defecto para control de listado (borrado fantasma)
+        });
+
+        await newOperation.save();
+        res.json({ message: 'Operación registrada correctamente' });
+    } catch (error) {
+        console.error('Error en POST /api/operation/register:', error);
+        res.status(500).json({ message: 'Error al registrar la operación' });
     }
-);
+});
+
+// GET /api/operation/:id -> Obtener detalles de una operación por ID
+router.get('/:id', authMiddleware, async (req, res) => {
+    try {
+        const opId = req.params.id;
+        const operation = await Operation.findById(opId);
+        if (!operation) {
+            return res.status(404).json({ message: 'Operación no encontrada' });
+        }
+        if (operation.userId.toString() !== req.user.id && req.user.role !== 'admin') {
+            return res.status(403).json({ message: 'No autorizado' });
+        }
+        res.json(operation);
+    } catch (error) {
+        console.error('Error en GET /api/operation/:id:', error);
+        res.status(500).json({ message: 'Error al obtener la operación' });
+    }
+});
+
+// PUT /api/operation/edit/:id -> Actualizar una operación existente
+router.put('/edit/:id', authMiddleware, upload.single('receiptImage'), async (req, res) => {
+    try {
+        const opId = req.params.id;
+        const operation = await Operation.findById(opId);
+        if (!operation) {
+            return res.status(404).json({ message: 'Operación no encontrada' });
+        }
+        if (operation.userId.toString() !== req.user.id && req.user.role !== 'admin') {
+            return res.status(403).json({ message: 'No autorizado' });
+        }
+
+        const {
+            canal,
+            plataforma,
+            ordenNum,
+            tipoActivo,
+            activo,
+            moneda,
+            monto,
+            cantidad,
+            total,
+            comision,
+            titularNombre,
+            titularTipoID,
+            titularDocumento,
+            titularDireccion,
+            terceroNombre,
+            terceroTipoID,
+            terceroDocumento,
+            cuentaDestino,
+            referenciaPago,
+            estadoPago,
+            fechaPagoDia,
+            fechaPagoMesHidden,
+            fechaPagoAnio,
+            cuentaOrigen
+        } = req.body;
+
+        let receiptImagePath = operation.receiptImage;
+        if (req.file) {
+            receiptImagePath = req.file.path;
+        }
+
+        let fecha;
+        if (fechaPagoDia && fechaPagoMesHidden && fechaPagoAnio) {
+            fecha = new Date(`${fechaPagoAnio}-${fechaPagoMesHidden.padStart(2, '0')}-${fechaPagoDia.padStart(2, '0')}`);
+        } else {
+            fecha = operation.fecha;
+        }
+
+        const updatedData = {
+            canal,
+            plataforma,
+            ordenNum: ordenNum ? parseInt(ordenNum) : operation.ordenNum,
+            tipoActivo,
+            activo,
+            moneda,
+            monto: monto ? parseFloat(monto) : operation.monto,
+            cantidad: cantidad ? parseFloat(cantidad) : operation.cantidad,
+            total: total ? parseFloat(total) : operation.total,
+            comision: comision ? parseFloat(comision) : operation.comision,
+            titularNombre,
+            titularTipoID,
+            titularDocumento,
+            titularDireccion,
+            terceroNombre,
+            terceroTipoID,
+            terceroDocumento,
+            cuentaDestino,
+            referenciaPago,
+            estadoPago,
+            fecha,
+            cuentaOrigen, // Campo editable para la cuenta de origen (número)
+            receiptImage: receiptImagePath
+        };
+
+        const updatedOperation = await Operation.findByIdAndUpdate(opId, updatedData, { new: true });
+        res.json({ message: 'Operación actualizada correctamente', operation: updatedOperation });
+    } catch (error) {
+        console.error('Error en PUT /api/operation/edit/:id:', error);
+        res.status(500).json({ message: 'Error al actualizar la operación' });
+    }
+});
 
 module.exports = router;

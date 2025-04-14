@@ -28,7 +28,6 @@
                     </button>
                 </li>
                 <li>
-                    <!-- Nuevo botón para Historial -->
                     <button onclick="window.location.href='user-history-operations.html'">
                         <img src="icon/history-icon.png" alt="Historial" class="sidebar-icon">
                         Historial operaciones
@@ -51,23 +50,15 @@
                 <!-- Nombre completo -->
                 <div class="input-group">
                     <label for="fullName">Nombre completo</label>
-                    <input
-                            type="text"
-                            id="fullName"
-                            placeholder="Ej. Juan Perez"
-                            required
-                    />
+                    <input type="text" id="fullName" placeholder="Ej. Juan Perez" required>
                 </div>
-
-                <!-- Código de país + bandera -->
-                <!-- Agrupación en la misma fila -->
+                <!-- Código de país + número de teléfono -->
                 <div class="phone-row">
-                    <!-- Bloque para el código de país -->
                     <div class="input-group phone-code">
                         <label for="countryCode">Código de país</label>
                         <div class="country-code-wrapper">
                             <div class="flag-container" id="flagContainer">
-                                <img id="countryFlag" src="icon/flags/co.png" alt="Flag" />
+                                <img id="countryFlag" src="icon/flags/co.png" alt="Flag">
                             </div>
                             <select id="countryCode">
                                 <option value="+57" data-flag="co.png" selected>+57 (CO)</option>
@@ -78,64 +69,37 @@
                             </select>
                         </div>
                     </div>
-
-                    <!-- Bloque para el número de teléfono -->
                     <div class="input-group phone-number">
                         <label for="phoneNumber">Número de teléfono</label>
-                        <input
-                                type="text"
-                                id="phoneNumber"
-                                placeholder="900100200"
-                                required
-                        />
+                        <input type="text" id="phoneNumber" placeholder="900100200" required>
                     </div>
                 </div>
-
-                <!-- Número de cuenta -->
-                <div class="input-group">
-                    <label for="accountNumber">Número de cuenta</label>
-                    <input
-                            type="text"
-                            id="accountNumber"
-                            placeholder="Ej. 100200300400500"
-                            required
-                    />
-                </div>
-
-                <!-- Fecha de nacimiento -->
-                <div class="input-group date-birth-group">
-                    <label for="birthDate">Fecha de nacimiento</label>
-                    <div class="date-separate">
-                        <input type="number" id="birthDia" placeholder="DD" min="1" max="31" class="date-input" />
-                        <div class="custom-month-select">
-                            <button type="button" class="custom-month-trigger">
-                                <span id="selectedBirthMonth">MM</span>
-                               
-                            </button>
-                            <div class="custom-month-dropdown">
-                                <button type="button" data-value="1">Enero</button>
-                                <button type="button" data-value="2">Febrero</button>
-                                <button type="button" data-value="3">Marzo</button>
-                                <button type="button" data-value="4">Abril</button>
-                                <button type="button" data-value="5">Mayo</button>
-                                <button type="button" data-value="6">Junio</button>
-                                <button type="button" data-value="7">Julio</button>
-                                <button type="button" data-value="8">Agosto</button>
-                                <button type="button" data-value="9">Septiembre</button>
-                                <button type="button" data-value="10">Octubre</button>
-                                <button type="button" data-value="11">Noviembre</button>
-                                <button type="button" data-value="12">Diciembre</button>
-                            </div>
-                        </div>
-                        <input type="number" id="birthAnio" placeholder="AAAA" min="1900" max="2100" class="date-input" />
+                <!-- Nuevo: Tipo de documento (desplegable angosto) y Número -->
+                <div class="input-group" style="display:flex; gap:10px; align-items: center;">
+                    <div style="flex:0 0 35%;">
+                        <label for="docType" style="font-size:0.9em;">Tipo de Documento</label>
+                        <select id="docType" required style="width:100%; font-size:0.9em;">
+                            <option value="">Seleccione...</option>
+                            <option value="DNI">DNI</option>
+                            <option value="CE">Cédula Extranjera</option>
+                            <option value="PASAPORTE">Pasaporte</option>
+                        </select>
                     </div>
-                    <input type="hidden" id="birthMesHidden" name="birthMes">
+                    <div style="flex:1;">
+                        <label for="docNumber" style="font-size:0.9em;">Número de Documento</label>
+                        <input type="text" id="docNumber" placeholder="Ej. 12345678A" required style="width:100%; font-size:0.9em;">
+                    </div>
+                </div>
+                <!-- Nuevo: Dirección con ícono -->
+                <div class="input-group icon-group">
+                    <label for="direccion">Dirección</label>
+                    <span class="icon">
+                        <img src="icon/icon-maps.png" alt="Icono Dirección">
+                    </span>
+                    <input type="text" id="direccion" placeholder="Dirección" required>
                 </div>
 
-                <!-- Botón de enviar -->
-                <button type="submit" class="btn-primary">
-                    Actualizar datos
-                </button>
+                <button type="submit" class="btn-primary">Actualizar datos</button>
             </form>
         </section>
     </main>
@@ -147,10 +111,9 @@
     <p>Actualizando datos...</p>
 </div>
 
-<!-- Toast de notificación -->
+<!-- Toast para notificaciones -->
 <div id="toast" class="toast" style="display: none;"></div>
 
-<!-- Script -->
 <script src="js/user-panel.js"></script>
 </body>
 </html>
